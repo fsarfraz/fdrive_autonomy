@@ -1,0 +1,20 @@
+x-common-env: &time_zone
+  TZ: America/New_York
+
+services:
+  sdrive:
+    image: shredder/sdrive:test
+    #runtime: nvidia
+    container_name: ros2_dev
+    volumes:
+      - ../build:/sdrive/build
+      - ../src:/sdrive/src
+      - ../install:/sdrive/install
+      - /dev/input:/dev/input:ro
+    network_mode: host
+    stdin_open: true
+    tty: true
+    restart: always
+    environment:
+      <<: *time_zone
+      RMW_IMPLEMENTATION: "rmw_cyclonedds_cpp"

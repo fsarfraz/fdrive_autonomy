@@ -1,0 +1,57 @@
+build/
+install/
+log/
+
+# Devenv/Nix
+# .devenv/
+# .devenv.flake.nix
+.direnv/
+.cargo/
+result
+result-*
+devenv.local.nix
+.pre-commit-config.yaml
+.pixi
+pixi.lock
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+
+# Rosbags
+*.db3
+*.mcap
+*.bag
+sdrive_bag/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Hardware/sensor specific
+192.168.50-metadata.json
+
+# Third-party packages (managed by vcstool - sdrive.repos)
+src/ouster-ros/
+src/direct_lidar_inertial_odometry/
+src/slam_toolbox/
+src/navigation2/
+src/nav2_minimal_turtlebot_simulation/
+src/robot_localization/
+src/mp2p_icp/
+src/mola_state_estimation/
+src/mola_sm_loop_closure/
+src/mola_lidar_odometry/
+src/mola_imu_preintegration/
+src/mola_common/
+src/mola/
+src/mrpt_ros/
+src/zenoh-plugin-ros2dds/# pixi environments
+.pixi/*
+!.pixi/config.toml

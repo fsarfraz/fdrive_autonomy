@@ -1,0 +1,19 @@
+sdrive_odometry:
+
+  ros__parameters:
+
+        track_separation: 0.4
+
+        sprocket_circumference: 0.2
+
+        gear_ratio: 14.5
+
+        erpm_to_rpm_divisor: 5.0
+         
+        odom_frame: "odom"
+
+        base_frame: "base_link"
+
+        publish_tf: false
+
+        odom_rate_hz: 50.0

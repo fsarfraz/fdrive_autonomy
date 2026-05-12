@@ -1,0 +1,15 @@
+{
+  "plugins": {
+    "ros2dds": {
+      "allow": {
+        "publishers": [
+          "/tf",
+          "/tf_static",
+          "/robot_description",
+          "/pgo_odom",
+          "/global_costmap"
+        ]
+      }
+    }
+  }
+}

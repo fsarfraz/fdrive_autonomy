@@ -1,0 +1,252 @@
+# =============================================================================
+# Pixi config for ROS 2 Jazzy with two environments:
+#
+#   default  - linux-64 desktop with conda-forge CUDA stack
+#              (pytorch-gpu, cupy, cuda-toolkit, mesa GL).
+#   jetson   - linux-aarch64 for Jetson Orin AGX. Uses JetPack-provided CUDA
+#              from the host (NOT conda-forge cuda-toolkit). PyTorch / CuPy
+#              come from NVIDIA's Jetson wheel index via pip - see notes in
+#              [feature.jetson.pypi-dependencies] before activating.
+#
+# Usage:
+#   pixi shell                    # default (x86_64 desktop)
+#   pixi shell -e jetson          # Jetson env
+#   pixi run  -e jetson cbuild
+#
+# =============================================================================
+
+[workspace]
+name = "ros-workspace"
+version = "0.1.0"
+channels = [
+    "https://prefix.dev/robostack-jazzy",
+    "https://prefix.dev/conda-forge",
+]
+platforms = ["linux-64", "linux-aarch64"]
+
+[activation.env]
+# Match devenv.nix ROS config (shared by both envs)
+RMW_IMPLEMENTATION = "rmw_cyclonedds_cpp"
+ROS_DOMAIN_ID = "1"
+QT_QPA_PLATFORM = "xcb"
+OGRE_RTT_MODE = "Copy"
+CYCLONEDDS_URI= "file://$PWD/cyclonedds.xml"
+
+[target.unix.activation]
+# Auto-source the colcon workspace if it's built
+scripts = ["install/setup.bash"]
+
+# ---- Shared dependencies (both desktop and Jetson) -------------------------
+[dependencies]
+# Python is pinned per-feature: 3.12 on desktop (matches Jazzy upstream),
+# 3.10 on jetson (NVIDIA's Jetson PyTorch wheels are cp310-only).
+pip = "*"
+
+# ROS 2 Jazzy
+ros-jazzy-ros-base = "*"
+ros-jazzy-ros-gz = "*"                       # Gazebo bridge
+ros-jazzy-rmw-cyclonedds-cpp = "*"
+ros-jazzy-interactive-markers = "*"
+
+# TF extras not in ros-base
+ros-jazzy-tf2-eigen = "*"
+ros-jazzy-tf2-sensor-msgs = "*"
+ros-jazzy-tf2-kdl = "*"
+ros-jazzy-tf-transformations = "*"
+ros-jazzy-rviz2 = "14.1.*"
+ros-jazzy-rviz-default-plugins = "14.1.*"
+
+# Perception
+ros-jazzy-cv-bridge = "*"
+ros-jazzy-image-transport = "*"
+ros-jazzy-pcl-conversions = "*"
+ros-jazzy-pcl-ros = "*"
+ros-jazzy-laser-geometry = "*"
+ros-jazzy-camera-calibration-parsers = "*"
+ros-jazzy-camera-info-manager = "*"
+
+# Navigation & motion planning
+ros-jazzy-behaviortree-cpp = "*"
+ros-jazzy-ompl = "*"
+ros-jazzy-diff-drive-controller = "*"
+ros-jazzy-joint-state-broadcaster = "*"
+ros-jazzy-joint-state-publisher = "*"
+ros-jazzy-joint-state-publisher-gui = "*"
+# ros-jazzy-slam-toolbox = "*"
+ros-jazzy-teleop-twist-keyboard = "*"
+ros-jazzy-nav2-common = "*"
+ros-jazzy-nav2-msgs = "*"
+ros-jazzy-nav2-costmap-2d = "*"
+ros-jazzy-robot-localization = "*"
+ros-jazzy-nav2-minimal-tb3-sim = "*"
+
+
+# Kinematics
+ros-jazzy-kdl-parser = "*"
+ros-jazzy-orocos-kdl-vendor = "*"
+
+# URDF / robot description
+ros-jazzy-urdf = "*"
+ros-jazzy-xacro = "*"
+
+# Utilities
+ros-jazzy-backward-ros = "*"
+ros-jazzy-diagnostic-updater = "*"
+ros-jazzy-geographic-msgs = "*"
+ros-jazzy-message-filters = "*"
+ros-jazzy-resource-retriever = "*"
+ros-jazzy-filters = "*"
+
+# Octomap
+ros-jazzy-octomap-msgs = "*"
+ros-jazzy-octomap-rviz-plugins = "*"
+
+# # Rosbag2 with MCAP
+# ros-jazzy-rosbag2 = "*"
+# ros-jazzy-rosbag2-cpp = "*"
+# ros-jazzy-rosbag2-py = "*"
+# ros-jazzy-rosbag2-storage-mcap = "*"
+# ros-jazzy-rosbag2-transport = "*"
+
+# Build toolchain
+libsystemd = "*"
+lttng-ust = "*"
+compilers = "*"                  # Picks gcc/g++ for the target platform
+cmake = "<4"
+ninja = "*"
+ccache = "*"
+pkg-config = "*"
+clang = "*"
+rust = "*"
+#mcap-cli = "*"
+lcov = "*"
+
+# Colcon
+colcon-common-extensions = "*"
+
+# Math / scientific / geometry libs
+eigen = "*"
+libboost-devel = "*"
+tbb-devel = "*"
+ceres-solver = "*"
+gtsam = "*"
+sophus = "*"
+nanoflann = "*"
+xtensor = "==0.24.7"
+xsimd = "*"
+benchmark = "*"
+suitesparse = "*"
+
+# Computer vision / point clouds
+libopencv = "*"
+pcl = "*"
+graphicsmagick = "*"
+
+
+# Geometry
+cgal-cpp = "*"
+gmp = "*"
+mpfr = "*"
+geographiclib-cpp = "*"
+assimp = "*"
+
+# Serialization / networking
+nlohmann_json = "*"
+yaml-cpp = "*"
+jsoncpp = "*"
+
+# Misc
+spdlog = "*"
+tinyxml2 = "*"
+cli11 = "*"
+graphviz = "*"
+
+# Python libs
+setuptools = "==79.0.1"
+numpy = "*"
+scipy = "*"
+matplotlib = "*"
+pyyaml = "*"
+pyzmq = "*"
+transforms3d = "*"
+"ruamel.yaml" = "*"
+shapely = "*"
+simple-parsing = "*"
+pytest = "*"
+argcomplete = "*"
+
+# ---- Desktop (linux-64) feature --------------------------------------------
+[feature.desktop]
+platforms = ["linux-64"]
+
+[feature.desktop.system-requirements]
+cuda = "12"
+
+[feature.desktop.activation.env]
+# nvcc / torch.compile find the toolkit inside the pixi env
+CUDA_HOME = "$CONDA_PREFIX"
+__NV_PRIME_RENDER_OFFLOAD = "1"
+__GLX_VENDOR_LIBRARY_NAME = "nvidia"
+
+[feature.desktop.dependencies]
+# conda-forge builds its own CUDA stack here - don't mix with system CUDA.
+python = "==3.12"
+cuda-version = "==12.6"
+cuda-toolkit = "*"               # nvcc + headers + libs (cublas, cufft, etc.)
+pytorch-gpu = "*"
+torchvision = "*"
+cupy = "*"
+
+
+# ---- Jetson (linux-aarch64) feature ----------------------------------------
+[feature.jetson]
+platforms = ["linux-aarch64"]
+
+[feature.jetson.system-requirements]
+cuda = "12"
+libc = "2.34"
+
+[feature.jetson.activation.env]
+LD_LIBRARY_PATH = "/usr/local/cuda/lib64:/usr/lib/aarch64-linux-gnu/tegra:$LD_LIBRARY_PATH"
+CUDA_HOME = "/usr/local/cuda"
+
+
+[feature.jetson.dependencies]
+python = "==3.12"
+# cuda = "*"
+# cuda-version = "12.6.*"
+# cuda-toolkit = "*"               # nvcc + headers + libs (cublas, cufft, etc.)
+cupy = "*"
+setuptools = "==79.0.1"
+
+[feature.jetson.pypi-dependencies]
+torch = { path = "./wheels/torch-2.4.0a0+gitd990dad-cp312-cp312-linux_aarch64.whl" }
+
+
+# ---- Environments ----------------------------------------------------------
+[environments]
+default = ["desktop"]
+jetson  = ["jetson"]
+
+# ---- Tasks -----------------------------------------------------------------
+[tasks]
+# Your cbuild - pixi's env IS the python env (no venv juggling)
+cbuild = "colcon build --symlink-install --parallel-workers 2 --cmake-args -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_BUILD_TYPE=Release"
+
+rviz = "ros2 run rviz2 rviz2"
+
+zenoh = "zenoh_bridge_ros2dds -c zenoh-bridge-config.json "
+
+lidar = "ros2 launch ouster_ros driver.launch.py"
+
+[tasks.build-sdbus-cpp]
+cmd = """
+    git clone -b v1.5.0 --depth 1 https://github.com/Kistler-Group/sdbus-cpp.git /tmp/sdbus-cpp \
+    && cd /tmp/sdbus-cpp && mkdir build && cd build \
+    && cmake .. \
+         -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX \
+         -DBUILD_SHARED_LIBS=ON \
+         -DCMAKE_CXX_STANDARD=17 \
+    && make -j$(nproc) && make install \
+    && rm -rf /tmp/sdbus-cpp
+"""

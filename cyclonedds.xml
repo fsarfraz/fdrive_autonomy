@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cyclonedds xmlns="https://cdds.io/config">
+    <domain>
+        <general>
+            <interfaces>
+                <networkinterface name="br0"/>
+            </interfaces>
+            <allowmulticast>false</allowmulticast>
+        </general>
+        <discovery>
+	    <peers> 
+	       <peer address="localhost"/>
+	    </peers>
+        </discovery>
+    </domain>
+</cyclonedds>
+ 

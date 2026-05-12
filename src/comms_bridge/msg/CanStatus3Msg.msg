@@ -1,0 +1,3 @@
+uint8 id
+float32 watt_hours
+float32 watt_hours_charged

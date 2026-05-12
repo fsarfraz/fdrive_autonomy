@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>shredder_description</name>
+  <version>0.0.1</version>
+  <description>URDF description for tracked vehicle</description>
+  <maintainer email="user@example.com">robotics_engineer</maintainer>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+
+  <!-- <depend>rclpy</depend> -->
+  <depend>geometry_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>xacro</depend>
+  <depend>robot_state_publisher</depend>
+  <depend>joint_state_publisher</depend>
+  <depend>joint_state_publisher_gui</depend>
+  <depend>rviz2</depend>
+  <depend>teleop_twist_keyboard</depend>
+
+  <!-- <build_depend>nav2_common</build_depend> -->
+  <build_depend>launch_ros</build_depend>
+
+  <exec_depend>launch_ros</exec_depend>
+  <!-- <exec_depend>nav2_common</exec_depend> -->
+  <exec_depend>slam_toolbox</exec_depend>
+
+  <exec_depend>python3</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+
+  <depend>grid_map_ros</depend>
+  <depend>grid_map_core</depend>
+  <depend>grid_map_msgs</depend>
+
+  <!-- Autonomy stack pulled into shredder_bringup.launch.py -->
+  <exec_depend>sdrive</exec_depend>
+  <exec_depend>nav2_bringup</exec_depend>
+  <exec_depend>elevation_mapping_cupy</exec_depend>
+  <exec_depend>rko_lio</exec_depend>
+  <exec_depend>simple_loop_closure</exec_depend>
+
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+    <gazebo_ros gazebo_model_path="${prefix}/models"/>
+  </export>
+</package>

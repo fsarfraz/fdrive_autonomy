@@ -1,0 +1,3 @@
+uint8 id
+float32 amp_hours
+float32 amp_hours_charged

@@ -1,0 +1,25 @@
+[submodule "src/rko_lio"]
+	path = src/rko_lio
+	url = https://github.com/fsarfraz/rko_lio.git
+[submodule "src/elevation_mapping_cupy"]
+	path = src/elevation_mapping_cupy
+	url = https://github.com/fsarfraz/elevation_mapping_cupy.git
+[submodule "src/simple_loop_closure"]
+	path = src/simple_loop_closure
+	url = https://github.com/fsarfraz/simple_loop_closure.git
+[submodule "src/ouster-ros"]
+	path = src/ouster-ros
+	url = https://github.com/fsarfraz/ouster-ros.git
+[submodule "src/grid_map"]
+	path = src/grid_map
+	url = https://github.com/ANYbotics/grid_map.git
+[submodule "src/ros2_numpy"]
+	path = src/ros2_numpy
+	url = https://github.com/Box-Robotics/ros2_numpy.git
+[submodule "src/zenoh-plugin-ros2dds"]
+	path = src/zenoh-plugin-ros2dds
+	url = https://github.com/eclipse-zenoh/zenoh-plugin-ros2dds.git
+[submodule "navigation2"]
+	path = src/navigation2
+	url = https://github.com/ros-navigation/navigation2.git
+	branch = jazzy

@@ -1,0 +1,711 @@
+<?xml version="1.0"?>
+<robot name="track" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Define properties based on your requirements -->
+  <xacro:property name="chassis_width" value="0.355"/> <!-- 35.5 cm -->
+  <xacro:property name="total_width" value="0.695"/> <!-- 69.5 cm -->
+  <xacro:property name="track_width" value="0.165"/> <!-- 16.5 cm -->
+  <xacro:property name="vehicle_length" value="1.285"/> <!-- 128.5 cm -->
+  <xacro:property name="vehicle_height" value="0.575"/> <!-- 57.5 cm -->
+  
+  <!-- Calculated dimensions -->
+  <xacro:property name="track_length" value="${vehicle_length * 0.9}"/> <!-- 1.1565 m -->
+  <xacro:property name="chassis_height" value="${vehicle_height * 0.6}"/> <!-- 0.345 m -->
+  <xacro:property name="wheel_radius" value="${vehicle_height * 0.3}"/> <!-- 0.1725 m -->
+  <xacro:property name="wheel_sep_length" value="${track_length * 0.7}"/> <!-- 0.80955 m -->
+  
+  <!-- Additional calculated values for positioning -->
+  <xacro:property name="track_offset_y" value="${(total_width - track_width) / 2}"/> <!-- 0.265 m from center -->
+  
+  <!-- ENHANCED FLIPPER DIMENSIONS -->
+  <xacro:property name="flipper_wheel_radius" value="${wheel_radius * 0.75}"/> <!-- Increased from 0.5 to 0.75 -->
+  <xacro:property name="flipper_small_wheel_radius" value="${flipper_wheel_radius * 0.4}"/> <!-- Proportionally larger -->
+  <xacro:property name="flipper_length" value="0.35"/> <!-- Increased from 0.33 to 0.50 -->
+  <xacro:property name="flipper_width" value="${track_width * 0.6}"/> <!-- Increased from 0.3 to 0.4 -->
+  <xacro:property name="flipper_bar_height" value="0.075"/> <!-- Increased from 0.055 to 0.075 -->
+  <xacro:property name="flipper_middle_bar_width" value="0.28"/> <!-- Increased from 0.2 to 0.28 -->
+  <xacro:property name="flipper_middle_bar_height" value="0.09"/> <!-- Increased from 0.07 to 0.09 -->
+
+  <!-- Base Footprint (Ground Plane Reference) -->
+  <!-- <link name="base_footprint">
+    <inertial>
+      <origin xyz="0 0 0.1" rpy="0 0 0"/>
+      <mass value="0.0001"/>
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0" 
+               iyy="0.0001" iyz="0.0" izz="0.0001"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.001 0.001 0.001"/>
+      </geometry>
+    </visual>
+  </link> -->
+
+  <link name="base_footprint"/>
+
+  <joint name="base_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0.0 0.0 0.010" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Base Link (Chassis) -->
+  <link name="base_link">
+    <inertial>
+      <origin xyz="0 0 ${chassis_height/2}" rpy="0 0 0"/>
+      <mass value="13.14"/>
+      <inertia ixx="0.10019" ixy="0" ixz="0" 
+               iyy="0.345043" iyz="0" izz="0.302044"/>
+    </inertial>
+    <collision>
+      <origin xyz="0 0 ${chassis_height/2}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${vehicle_length} ${chassis_width} ${chassis_height}"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 ${chassis_height/2}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${vehicle_length} ${chassis_width} ${chassis_height}"/>
+      </geometry>
+    </visual>
+  </link>
+
+
+  <!-- Left Track -->
+  <link name="left_track">
+    <inertial>
+      <origin xyz="0 0 0.0141" rpy="0 0 0"/>
+      <mass value="6.06"/>
+      <inertia ixx="0.002731" ixy="0" ixz="0" 
+               iyy="0.032554" iyz="0.000015" izz="0.031391"/>
+    </inertial>
+    <collision name="left_track_collision">
+      <origin xyz="0 0 ${wheel_radius/2}" rpy="1.5708 0 1.5708"/>
+      <geometry>
+        <box size="${track_width} ${wheel_radius} ${track_length}"/>
+      </geometry>
+    </collision>
+    <collision name="left_track_collision_1">
+      <origin xyz="${wheel_sep_length/2} 0 ${wheel_radius/2}" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${track_width}" radius="${wheel_radius/2}"/>
+      </geometry>
+    </collision>
+    <collision name="left_track_collision_2">
+      <origin xyz="${-wheel_sep_length/2} 0 ${wheel_radius/2}" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${track_width}" radius="${wheel_radius/2}"/>
+      </geometry>
+    </collision>
+    <visual name="left_track_visual">
+      <origin xyz="0 0 ${wheel_radius/2}" rpy="1.5708 0 1.5708"/>
+      <geometry>
+        <box size="${track_width} ${wheel_radius} ${track_length}"/>
+      </geometry>
+    </visual>
+    <visual name="left_track_visual_1">
+      <origin xyz="${wheel_sep_length/2} 0 ${wheel_radius/2}" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${track_width}" radius="${wheel_radius/2}"/>
+      </geometry>
+    </visual>
+    <visual name="left_track_visual_2">
+      <origin xyz="${-wheel_sep_length/2} 0 ${wheel_radius/2}" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${track_width}" radius="${wheel_radius/2}"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="left_track_j" type="revolute">
+    <parent link="base_link"/>
+    <child link="left_track"/>
+    <origin xyz="0 ${track_offset_y} 0" rpy="0 0 0"/>
+    <limit lower="0" upper="0" effort="1000" velocity="0"/>
+    <dynamics damping="1000" friction="1000"/>
+  </joint>
+
+  <!-- Right Track -->
+  <link name="right_track">
+    <inertial>
+      <origin xyz="0 0 0.0141" rpy="0 0 0"/>
+      <mass value="6.06"/>
+      <inertia ixx="0.002731" ixy="0" ixz="0" 
+               iyy="0.032554" iyz="0.000015" izz="0.031391"/>
+    </inertial>
+    <collision name="right_track_collision">
+      <origin xyz="0 0 ${wheel_radius/2}" rpy="1.5708 0 1.5708"/>
+      <geometry>
+        <box size="${track_width} ${wheel_radius} ${track_length}"/>
+      </geometry>
+    </collision>
+    <collision name="right_track_collision_1">
+      <origin xyz="${wheel_sep_length/2} 0 ${wheel_radius/2}" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${track_width}" radius="${wheel_radius/2}"/>
+      </geometry>
+    </collision>
+    <collision name="right_track_collision_2">
+      <origin xyz="${-wheel_sep_length/2} 0 ${wheel_radius/2}" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${track_width}" radius="${wheel_radius/2}"/>
+      </geometry>
+    </collision>
+    <visual name="right_track_visual">
+      <origin xyz="0 0 ${wheel_radius/2}" rpy="1.5708 0 1.5708"/>
+      <geometry>
+        <box size="${track_width} ${wheel_radius} ${track_length}"/>
+      </geometry>
+    </visual>
+    <visual name="right_track_visual_1">
+      <origin xyz="${wheel_sep_length/2} 0 ${wheel_radius/2}" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${track_width}" radius="${wheel_radius/2}"/>
+      </geometry>
+    </visual>
+    <visual name="right_track_visual_2">
+      <origin xyz="${-wheel_sep_length/2} 0 ${wheel_radius/2}" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${track_width}" radius="${wheel_radius/2}"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="right_track_j" type="revolute">
+    <parent link="base_link"/>
+    <child link="right_track"/>
+    <origin xyz="0 ${-track_offset_y} 0" rpy="0 0 0"/>
+    <limit lower="0" upper="0" effort="1000" velocity="0"/>
+    <dynamics damping="1000" friction="1000"/>
+  </joint>
+
+  <!-- Front Left Flipper (Enhanced) -->
+  <link name="front_left_flipper">
+    <inertial>
+      <origin xyz="0.12 0 0" rpy="0 0 0"/> <!-- Adjusted for longer flipper -->
+      <mass value="1.2"/> <!-- Increased mass for bigger flipper -->
+      <inertia ixx="0.005" ixy="0" ixz="0" 
+               iyy="0.035" iyz="0" izz="0.032"/>
+    </inertial>
+    <collision name="front_left_flipper_collision_large_wheel">
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${flipper_width}" radius="${flipper_wheel_radius}"/>
+      </geometry>
+    </collision>
+    <collision name="front_left_flipper_collision_small_wheel">
+      <origin xyz="${flipper_length} 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${flipper_width}" radius="${flipper_small_wheel_radius}"/>
+      </geometry>
+    </collision>
+    <collision name="front_left_flipper_collision_top_bar">
+      <origin xyz="${flipper_length/2} 0 0.045" rpy="0 0.184162 0"/>
+      <geometry>
+        <box size="${flipper_length} ${flipper_width} ${flipper_bar_height}"/>
+      </geometry>
+    </collision>
+    <collision name="front_left_flipper_collision_bottom_bar">
+      <origin xyz="${flipper_length/2} 0 -0.045" rpy="0 -0.184162 0"/>
+      <geometry>
+        <box size="${flipper_length} ${flipper_width} ${flipper_bar_height}"/>
+      </geometry>
+    </collision>
+    <collision name="front_left_flipper_collision_middle_bar">
+      <origin xyz="${flipper_length/2} 0 0.004" rpy="0 -0.02 0"/>
+      <geometry>
+        <box size="${flipper_middle_bar_width} ${flipper_width} ${flipper_middle_bar_height}"/>
+      </geometry>
+    </collision>
+    <visual name="front_left_flipper_visual_large_wheel">
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${flipper_width}" radius="${flipper_wheel_radius}"/>
+      </geometry>
+    </visual>
+    <visual name="front_left_flipper_visual_small_wheel">
+      <origin xyz="${flipper_length} 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${flipper_width}" radius="${flipper_small_wheel_radius}"/>
+      </geometry>
+    </visual>
+    <visual name="front_left_flipper_visual_top_bar">
+      <origin xyz="${flipper_length/2} 0 0.045" rpy="0 0.184162 0"/>
+      <geometry>
+        <box size="${flipper_length} ${flipper_width} ${flipper_bar_height}"/>
+      </geometry>
+    </visual>
+    <visual name="front_left_flipper_visual_bottom_bar">
+      <origin xyz="${flipper_length/2} 0 -0.045" rpy="0 -0.184162 0"/>
+      <geometry>
+        <box size="${flipper_length} ${flipper_width} ${flipper_bar_height}"/>
+      </geometry>
+    </visual>
+    <visual name="front_left_flipper_visual_middle_bar">
+      <origin xyz="${flipper_length/2} 0 0.004" rpy="0 -0.02 0"/>
+      <geometry>
+        <box size="${flipper_middle_bar_width} ${flipper_width} ${flipper_middle_bar_height}"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="front_left_flipper_j" type="revolute">
+    <parent link="left_track"/>
+    <child link="front_left_flipper"/>
+    <origin xyz="${wheel_sep_length/2} ${track_width * 0.43} 0.001" rpy="0 -0.4965 0"/>
+    <limit lower="0" upper="0" effort="1000" velocity="0"/>
+    <dynamics damping="1000" friction="1000"/>
+  </joint>
+
+  <!-- Rear Left Flipper (Enhanced) -->
+  <link name="rear_left_flipper">
+    <inertial>
+      <origin xyz="0.12 0 0" rpy="0 0 0"/>
+      <mass value="1.2"/>
+      <inertia ixx="0.005" ixy="0" ixz="0" 
+               iyy="0.035" iyz="0" izz="0.032"/>
+    </inertial>
+    <collision name="rear_left_flipper_collision_large_wheel">
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${flipper_width}" radius="${flipper_wheel_radius}"/>
+      </geometry>
+    </collision>
+    <collision name="rear_left_flipper_collision_small_wheel">
+      <origin xyz="${flipper_length} 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${flipper_width}" radius="${flipper_small_wheel_radius}"/>
+      </geometry>
+    </collision>
+    <collision name="rear_left_flipper_collision_top_bar">
+      <origin xyz="${flipper_length/2} 0 0.045" rpy="0 0.184162 0"/>
+      <geometry>
+        <box size="${flipper_length} ${flipper_width} ${flipper_bar_height}"/>
+      </geometry>
+    </collision>
+    <collision name="rear_left_flipper_collision_bottom_bar">
+      <origin xyz="${flipper_length/2} 0 -0.045" rpy="0 -0.184162 0"/>
+      <geometry>
+        <box size="${flipper_length} ${flipper_width} ${flipper_bar_height}"/>
+      </geometry>
+    </collision>
+    <collision name="rear_left_flipper_collision_middle_bar">
+      <origin xyz="${flipper_length/2} 0 0.004" rpy="0 -0.02 0"/>
+      <geometry>
+        <box size="${flipper_middle_bar_width} ${flipper_width} ${flipper_middle_bar_height}"/>
+      </geometry>
+    </collision>
+    <visual name="rear_left_flipper_visual_large_wheel">
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${flipper_width}" radius="${flipper_wheel_radius}"/>
+      </geometry>
+    </visual>
+    <visual name="rear_left_flipper_visual_small_wheel">
+      <origin xyz="${flipper_length} 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${flipper_width}" radius="${flipper_small_wheel_radius}"/>
+      </geometry>
+    </visual>
+    <visual name="rear_left_flipper_visual_top_bar">
+      <origin xyz="${flipper_length/2} 0 0.045" rpy="0 0.184162 0"/>
+      <geometry>
+        <box size="${flipper_length} ${flipper_width} ${flipper_bar_height}"/>
+      </geometry>
+    </visual>
+    <visual name="rear_left_flipper_visual_bottom_bar">
+      <origin xyz="${flipper_length/2} 0 -0.045" rpy="0 -0.184162 0"/>
+      <geometry>
+        <box size="${flipper_length} ${flipper_width} ${flipper_bar_height}"/>
+      </geometry>
+    </visual>
+    <visual name="rear_left_flipper_visual_middle_bar">
+      <origin xyz="${flipper_length/2} 0 0.004" rpy="0 -0.02 0"/>
+      <geometry>
+        <box size="${flipper_middle_bar_width} ${flipper_width} ${flipper_middle_bar_height}"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="rear_left_flipper_j" type="revolute">
+    <parent link="left_track"/>
+    <child link="rear_left_flipper"/>
+    <origin xyz="${-wheel_sep_length/2} ${track_width * 0.43} 0.001" rpy="3.14159 -0.5 3.14159"/>
+    <limit lower="0" upper="0" effort="1000" velocity="0"/>
+    <dynamics damping="1000" friction="1000"/>
+  </joint>
+
+  <!-- Front Right Flipper (Enhanced) -->
+  <link name="front_right_flipper">
+    <inertial>
+      <origin xyz="-0.12 0 0" rpy="0 0 0"/>
+      <mass value="1.2"/>
+      <inertia ixx="0.005" ixy="0" ixz="0" 
+               iyy="0.035" iyz="0" izz="0.032"/>
+    </inertial>
+    <collision name="front_right_flipper_collision_large_wheel">
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${flipper_width}" radius="${flipper_wheel_radius}"/>
+      </geometry>
+    </collision>
+    <collision name="front_right_flipper_collision_small_wheel">
+      <origin xyz="${-flipper_length} 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${flipper_width}" radius="${flipper_small_wheel_radius}"/>
+      </geometry>
+    </collision>
+    <collision name="front_right_flipper_collision_top_bar">
+      <origin xyz="${-flipper_length/2} 0 0.045" rpy="0 0.184162 -3.14159"/>
+      <geometry>
+        <box size="${flipper_length} ${flipper_width} ${flipper_bar_height}"/>
+      </geometry>
+    </collision>
+    <collision name="front_right_flipper_collision_bottom_bar">
+      <origin xyz="${-flipper_length/2} 0 -0.045" rpy="0 -0.184162 -3.14159"/>
+      <geometry>
+        <box size="${flipper_length} ${flipper_width} ${flipper_bar_height}"/>
+      </geometry>
+    </collision>
+    <collision name="front_right_flipper_collision_middle_bar">
+      <origin xyz="${-flipper_length/2} 0 0.004" rpy="0 -0.02 -3.14159"/>
+      <geometry>
+        <box size="${flipper_middle_bar_width} ${flipper_width} ${flipper_middle_bar_height}"/>
+      </geometry>
+    </collision>
+    <visual name="front_right_flipper_visual_large_wheel">
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${flipper_width}" radius="${flipper_wheel_radius}"/>
+      </geometry>
+    </visual>
+    <visual name="front_right_flipper_visual_small_wheel">
+      <origin xyz="${-flipper_length} 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${flipper_width}" radius="${flipper_small_wheel_radius}"/>
+      </geometry>
+    </visual>
+    <visual name="front_right_flipper_visual_top_bar">
+      <origin xyz="${-flipper_length/2} 0 0.045" rpy="0 0.184162 -3.14159"/>
+      <geometry>
+        <box size="${flipper_length} ${flipper_width} ${flipper_bar_height}"/>
+      </geometry>
+    </visual>
+    <visual name="front_right_flipper_visual_bottom_bar">
+      <origin xyz="${-flipper_length/2} 0 -0.045" rpy="0 -0.184162 -3.14159"/>
+      <geometry>
+        <box size="${flipper_length} ${flipper_width} ${flipper_bar_height}"/>
+      </geometry>
+    </visual>
+    <visual name="front_right_flipper_visual_middle_bar">
+      <origin xyz="${-flipper_length/2} 0 0.004" rpy="0 -0.02 -3.14159"/>
+      <geometry>
+        <box size="${flipper_middle_bar_width} ${flipper_width} ${flipper_middle_bar_height}"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="front_right_flipper_j" type="revolute">
+    <parent link="right_track"/>
+    <child link="front_right_flipper"/>
+    <origin xyz="${wheel_sep_length/2} ${-track_width * 0.43} 0.001" rpy="3.14159 0.5 3.14159"/>
+    <limit lower="0" upper="0" effort="1000" velocity="0"/>
+    <dynamics damping="1000" friction="1000"/>
+  </joint>
+
+  <!-- Rear Right Flipper (Enhanced) -->
+  <link name="rear_right_flipper">
+    <inertial>
+      <origin xyz="-0.12 0 0" rpy="0 0 0"/>
+      <mass value="1.2"/>
+      <inertia ixx="0.005" ixy="0" ixz="0" 
+               iyy="0.035" iyz="0" izz="0.032"/>
+    </inertial>
+    <collision name="rear_right_flipper_collision_large_wheel">
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${flipper_width}" radius="${flipper_wheel_radius}"/>
+      </geometry>
+    </collision>
+    <collision name="rear_right_flipper_collision_small_wheel">
+      <origin xyz="${-flipper_length} 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${flipper_width}" radius="${flipper_small_wheel_radius}"/>
+      </geometry>
+    </collision>
+    <collision name="rear_right_flipper_collision_top_bar">
+      <origin xyz="${-flipper_length/2} 0 0.045" rpy="0 0.184162 -3.14159"/>
+      <geometry>
+        <box size="${flipper_length} ${flipper_width} ${flipper_bar_height}"/>
+      </geometry>
+    </collision>
+    <collision name="rear_right_flipper_collision_bottom_bar">
+      <origin xyz="${-flipper_length/2} 0 -0.045" rpy="0 -0.184162 -3.14159"/>
+      <geometry>
+        <box size="${flipper_length} ${flipper_width} ${flipper_bar_height}"/>
+      </geometry>
+    </collision>
+    <collision name="rear_right_flipper_collision_middle_bar">
+      <origin xyz="${-flipper_length/2} 0 0.004" rpy="0 -0.02 -3.14159"/>
+      <geometry>
+        <box size="${flipper_middle_bar_width} ${flipper_width} ${flipper_middle_bar_height}"/>
+      </geometry>
+    </collision>
+    <visual name="rear_right_flipper_visual_large_wheel">
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${flipper_width}" radius="${flipper_wheel_radius}"/>
+      </geometry>
+    </visual>
+    <visual name="rear_right_flipper_visual_small_wheel">
+      <origin xyz="${-flipper_length} 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${flipper_width}" radius="${flipper_small_wheel_radius}"/>
+      </geometry>
+    </visual>
+    <visual name="rear_right_flipper_visual_top_bar">
+      <origin xyz="${-flipper_length/2} 0 0.045" rpy="0 0.184162 -3.14159"/>
+      <geometry>
+        <box size="${flipper_length} ${flipper_width} ${flipper_bar_height}"/>
+      </geometry>
+    </visual>
+    <visual name="rear_right_flipper_visual_bottom_bar">
+      <origin xyz="${-flipper_length/2} 0 -0.045" rpy="0 -0.184162 -3.14159"/>
+      <geometry>
+        <box size="${flipper_length} ${flipper_width} ${flipper_bar_height}"/>
+      </geometry>
+    </visual>
+    <visual name="rear_right_flipper_visual_middle_bar">
+      <origin xyz="${-flipper_length/2} 0 0.004" rpy="0 -0.02 -3.14159"/>
+      <geometry>
+        <box size="${flipper_middle_bar_width} ${flipper_width} ${flipper_middle_bar_height}"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="rear_right_flipper_j" type="revolute">
+    <parent link="right_track"/>
+    <child link="rear_right_flipper"/>
+    <origin xyz="${-wheel_sep_length/2} ${-track_width * 0.43} 0.001" rpy="0 0.4962 0"/>
+    <limit lower="0" upper="0" effort="1000" velocity="0"/>
+    <dynamics damping="1000" friction="1000"/>
+  </joint>
+
+  <!-- Ouster Lidar -->
+  <link name="os_lidar">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.2"/>
+      <inertia ixx="0.001" ixy="0" ixz="0"
+               iyy="0.001" iyz="0" izz="0.001"/>
+    </inertial>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.05" radius="0.08"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.05" radius="0.08"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0 0 1 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="os_lidar_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="os_lidar"/>
+    <origin xyz="0.63 0 ${chassis_height + 0.025}" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Ouster IMU (co-located with lidar in Ouster sensor housing) -->
+  <link name="os_imu">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.001"/>
+      <inertia ixx="0.00001" ixy="0" ixz="0"
+               iyy="0.00001" iyz="0" izz="0.00001"/>
+    </inertial>
+  </link>
+
+  <joint name="os_imu_joint" type="fixed">
+    <parent link="os_lidar"/>
+    <child link="os_imu"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Gazebo-specific elements -->
+  <gazebo reference="os_imu">
+    <sensor name="os_imu" type="imu">
+      <always_on>1</always_on>
+      <update_rate>1</update_rate>
+      <visualize>true</visualize>
+      <gz_frame_id>os_imu</gz_frame_id>
+      <topic>ouster/imu</topic>
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="left_track">
+    <mu1>0.7</mu1>
+    <mu2>150</mu2>
+    <fdir1>0 1 0</fdir1>
+  </gazebo>
+
+  <gazebo reference="right_track">
+    <mu1>0.7</mu1>
+    <mu2>150</mu2>
+    <fdir1>0 1 0</fdir1>
+  </gazebo>
+
+  <gazebo reference="front_left_flipper">
+    <mu1>0.7</mu1>
+    <mu2>150</mu2>
+    <fdir1>0 1 0</fdir1>
+    <selfCollide>true</selfCollide>
+    <maxContacts>20</maxContacts>
+  </gazebo>
+
+  <gazebo reference="rear_left_flipper">
+    <mu1>0.7</mu1>
+    <mu2>150</mu2>
+    <fdir1>0 1 0</fdir1>
+    <selfCollide>true</selfCollide>
+    <maxContacts>20</maxContacts>
+  </gazebo>
+
+  <gazebo reference="front_right_flipper">
+    <mu1>0.7</mu1>
+    <mu2>150</mu2>
+    <fdir1>0 1 0</fdir1>
+    <selfCollide>true</selfCollide>
+    <maxContacts>20</maxContacts>
+  </gazebo>
+
+  <gazebo reference="rear_right_flipper">
+    <mu1>0.7</mu1>
+    <mu2>150</mu2>
+    <fdir1>0 1 0</fdir1>
+    <selfCollide>true</selfCollide>
+    <maxContacts>20</maxContacts>
+  </gazebo>
+
+  <gazebo reference="os_lidar">
+    <material>Gazebo/Blue</material>
+    <sensor name="os_lidar" type="gpu_lidar">
+      <update_rate>10</update_rate>
+      <visualize>true</visualize>
+      <always_on>true</always_on>
+      <gz_frame_id>os_lidar</gz_frame_id>
+      <topic>/ouster</topic>
+      <lidar>
+        <scan>
+          <horizontal>
+            <samples>2048</samples>
+            <resolution>1</resolution>
+            <min_angle>-3.14159265359</min_angle>
+            <max_angle>3.14159265359</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>128</samples>
+            <resolution>1</resolution>
+            <min_angle>-0.55</min_angle>
+            <max_angle>0.26</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>0.75</min>
+          <max>131.0</max>
+          <resolution>0.01</resolution>
+        </range>
+      </lidar>
+    </sensor>
+  </gazebo>
+
+  <!-- Gazebo Plugins -->
+  <gazebo>
+    <plugin name="gz::sim::systems::TrackedVehicle" filename="gz-sim-tracked-vehicle-system">
+      <left_track>
+        <link>left_track</link>
+      </left_track>
+      <left_track>
+        <link>front_left_flipper</link>
+      </left_track>
+      <left_track>
+        <link>rear_left_flipper</link>
+      </left_track>
+      <right_track>
+        <link>right_track</link>
+      </right_track>
+      <right_track>
+        <link>front_right_flipper</link>
+      </right_track>
+      <right_track>
+        <link>rear_right_flipper</link>
+      </right_track>
+      <topic>cmd_vel</topic>
+      <tracks_separation>${track_offset_y * 2}</tracks_separation>
+      <tracks_height>${wheel_radius}</tracks_height>
+      <steering_efficiency>0.7</steering_efficiency>
+      <odom_publish_frequency>50</odom_publish_frequency>
+      <odom_topic>/fake_odom</odom_topic>
+      <tf_topic>/tf</tf_topic>
+      <frame_id>not_rko_odom</frame_id>
+      <child_frame_id>base_footprint</child_frame_id>
+    </plugin>
+
+    <plugin name="gz::sim::systems::TrackController" filename="gz-sim-track-controller-system">
+      <link>left_track</link>
+      <min_velocity>-1.0</min_velocity>
+      <max_velocity>3.0</max_velocity>
+    </plugin>
+
+    <plugin name="gz::sim::systems::TrackController" filename="gz-sim-track-controller-system">
+      <link>right_track</link>
+      <min_velocity>-1.0</min_velocity>
+      <max_velocity>3.0</max_velocity>
+    </plugin>
+
+    <plugin name="gz::sim::systems::TrackController" filename="gz-sim-track-controller-system">
+      <link>front_left_flipper</link>
+      <min_velocity>-1.0</min_velocity>
+      <max_velocity>3.0</max_velocity>
+    </plugin>
+
+    <plugin name="gz::sim::systems::TrackController" filename="gz-sim-track-controller-system">
+      <link>rear_left_flipper</link>
+      <min_velocity>-1.0</min_velocity>
+      <max_velocity>3.0</max_velocity>
+    </plugin>
+
+    <plugin name="gz::sim::systems::TrackController" filename="gz-sim-track-controller-system">
+      <link>front_right_flipper</link>
+      <min_velocity>-1.0</min_velocity>
+      <max_velocity>3.0</max_velocity>
+    </plugin>
+
+    <plugin name="gz::sim::systems::TrackController" filename="gz-sim-track-controller-system">
+      <link>rear_right_flipper</link>
+      <min_velocity>-1.0</min_velocity>
+      <max_velocity>3.0</max_velocity>
+    </plugin>
+
+    <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher">
+      <topic>joint_states</topic>
+      <update_rate>30</update_rate>
+      <!-- <joint_name>base_footprint_joint</joint_name> -->
+      <joint_name>left_track_j</joint_name>
+      <joint_name>right_track_j</joint_name>
+      <joint_name>front_left_flipper_j</joint_name>
+      <joint_name>front_right_flipper_j</joint_name>
+      <joint_name>rear_left_flipper_j</joint_name>
+      <joint_name>rear_right_flipper_j</joint_name>
+    </plugin>
+  </gazebo>
+
+</robot>
